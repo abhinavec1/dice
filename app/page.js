@@ -1,95 +1,130 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client'
+import {Button, Col, Form, Input, message, Row} from "antd";
+import SortFilter from "@/Components/SortFilter";
+import {SortIcon} from "@/Utils/svg";
+import {useEffect, useState} from "react";
+import {API_MANAGER} from "@/API";
+import HELPERS from "@/Utils/helpers";
+
+const sortFields = [
+    {
+        label: "Stars",
+        name: "stargazers_count"
+    },
+    {
+        label: "Watchers Count",
+        name: "watchers_count"
+    },
+    {
+        label: "Score",
+        name: "score"
+    },
+    {
+        label: "Name",
+        name: "full_name"
+    },
+    {
+        label: "Created At",
+        name: "created_at"
+    },
+    {
+        label: "Updated At",
+        name: "updated_at"
+    },
+]
 
 export default function Home() {
-  return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    const [showSortPopup, setShowSortPopup] = useState(false)
+    const [sortFilterVal, setSortFilterVal] = useState({field: null, dir: null})
+    const [repoList, setRepoList] = useState([])
+    const [searchForm] = Form.useForm()
+
+    useEffect(() => {
+        if (repoList?.length > 0) {
+            // getRepos()
+            const sortedData = HELPERS.sortData(repoList, sortFilterVal?.field, sortFilterVal?.dir)
+            setRepoList(sortedData)
+        }
+    }, [sortFilterVal])
+
+    const getRepos = async () => {
+        const params = {
+            q: searchForm.getFieldValue('query'),
+            sort: sortFilterVal?.field,
+            order: sortFilterVal?.dir,
+        }
+        try {
+            const response = await API_MANAGER.getRepos(params)
+            setRepoList(response?.data?.items)
+        } catch (err) {
+            message.warning('Something went wrong')
+        }
+    }
+
+    return (
+        <div className={'layout-main'}>
+            <Row className={'action-main'} gutter={16}>
+                <Col className={'input-container'}>
+                    <Form
+                        layout={'vertical'}
+                        form={searchForm}
+                    >
+                        <Form.Item
+                            label={'Enter Search String'}
+                            name='query'
+                        >
+                            <Input
+                                onPressEnter={getRepos}
+                            />
+                        </Form.Item>
+                    </Form>
+                </Col>
+                <Col className={'filter-container d-flex align-items-bottom hover-pointer'}>
+                    <SortFilter
+                        fields={sortFields}
+                        showPopup={showSortPopup}
+                        setShowPopup={setShowSortPopup}
+                        buttonClassName={"sort-filter-icon-button"}
+                        setSortFilterVal={setSortFilterVal}
+                    >
+                        <Button className={'flex-center'}>
+                            <SortIcon
+                                className={"get-hover sort-filter-icon-button"}
+                                onClick={() => setShowSortPopup(!showSortPopup)}
+                            />
+                        </Button>
+                    </SortFilter>
+                </Col>
+            </Row>
+            <Row className={'content-main'} gutter={[24, 24]}>
+                {repoList?.map(item => (
+                    <Col lg={8} md={12} xs={24} key={item?.id}>
+                        <div className={'d-flex card-main align-items-center'}>
+                            <div className={'img-container'}>
+                                <img src={item?.owner?.avatar_url} alt={'avatar'}/>
+                            </div>
+                            <div className={'content-main'}>
+                                <div className={'content'}>
+                                    <span className={'heading'}>Repo name: </span>
+                                    <span>{item?.full_name}</span>
+                                </div>
+                                <div className={'content'}>
+                                    <span className={'heading'}>Stars: </span>
+                                    <span>{item?.stargazers_count}</span>
+                                </div>
+                                <div className={'content'}>
+                                    <span className={'heading'}>Description: </span>
+                                    <span>{item?.description}</span>
+                                </div>
+                                <div className={'content'}>
+                                    <span className={'heading'}>Language: </span>
+                                    <span>{item?.language}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </Col>
+                ))}
+            </Row>
         </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+    );
 }

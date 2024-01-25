@@ -1,0 +1,25 @@
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.align-items-bottom {
+  align-items: flex-end;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.hover-pointer:hover {
+  cursor: pointer;
+}
+
+.flex-center {
+  align-items: center;
+  justify-content: center;
+}

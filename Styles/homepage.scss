@@ -1,0 +1,45 @@
+.layout-main {
+  padding: 50px;
+
+  @media screen and (max-width: 576px) {
+    padding: 50px 20px;
+  }
+
+  .action-main {
+
+    .input-container {
+      flex-grow: 1;
+    }
+
+    .filter-container {
+      padding-bottom: 24px;
+    }
+  }
+
+  .content-main {
+    padding-top: 20px;
+    .card-main {
+      gap: 6px;
+      border: 2px solid grey;
+      border-radius: 10px;
+      padding: 5px 10px ;
+      overflow: hidden;
+
+      .img-container {
+        height: 100px;
+        width: 100px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+
+        img {
+          height: 100%;
+        }
+      }
+
+      .heading {
+        font-weight: 600;
+      }
+    }
+  }
+}
